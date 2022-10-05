@@ -12,24 +12,30 @@ Example
 ` python benchmark.py -i "data.fits" --cpu `
  
  Help:
-` 
+
  usage: benchmark.py [-h] -i FILE [-c] [-g]
 
 Reduce IR data with a linear fit
 
 optional arguments:
+
   -h, --help            show this help message and exit
+  
   -i FILE, --input FILE
+  
                         input file (default: None)
+                        
   -c, --cpu             select cpu implementation (default: False)
-  -g, --gpu             select gpu implementation (default: False)`
+  
+  -g, --gpu             select gpu implementation (default: False)
+  
   
   
 ## Running `reduce.py`
 
 ` python reduce.py -i "data.fits" -o "slopes.fits" --gpu -n 256 `
 
-`
+
 usage: reduce.py [-h] -i FILE -o FILE [-c] [-g] [-n NPIX]
 
 Reduce IR data with a linear fit
@@ -43,4 +49,4 @@ optional arguments:
   -c, --cpu             select cpu implementation (default: False)
   -g, --gpu             select gpu implementation (default: False)
   -n NPIX, --number_of_pixels NPIX
-                        number of pixels in batch (default: 65536)`
+                        number of pixels in batch (default: 65536)
