@@ -71,7 +71,7 @@ def benchmark_cpu(data):
     (pix_tot, n_frames, m_axis) = data.shape
     
     # pass in data in batches of 2**n, up to the total pixel number
-    data_batches = range(4,int(np.ceil(np.log2(pix_tot))),1)
+    data_batches = range(2,int(np.ceil(np.log2(pix_tot))),1)
 
     # loop through data batch sizes
     for batch_size in data_batches:
@@ -100,7 +100,7 @@ def benchmark_gpu(data):
     (pix_tot, n_frames, m_axis) = data.shape
     
     # pass in data in batches of 2**n, up to the total pixel number
-    data_batches = range(2,int(np.ceil(np.log2(pix_tot))),1)
+    data_batches = range(12,int(np.ceil(np.log2(pix_tot))),1)
 
     # loop through data batch sizes
     for batch_size in data_batches:
