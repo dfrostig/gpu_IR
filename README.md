@@ -3,13 +3,13 @@ A public repo for GPU implementations of IR astronomical data reduction techniqu
 
 ## How to use gpu_IR
 
-gpu_IR is currently base on two scripts, 'benchmark.py' and 'reduce.py'. Both scripts take in a fits file of non-destructive or up-the-ramp data and performs a linear fit on each pixel. 'benchmark.py' reduces (linear fit) the data on either a gpu or cpu, splitting up the job into smaller batches of pixels. The script runs through a range of batch sizes and reports the fastest data reduction time and the corresponding batch size. Then one can run 'reduce.py' to reduce data with the optimal batch size as an input.
+gpu_IR is currently base on two scripts, `benchmark.py` and `reduce.py`. Both scripts take in a fits file of non-destructive or up-the-ramp data and performs a linear fit on each pixel. `benchmark.py` reduces (linear fit) the data on either a gpu or cpu, splitting up the job into smaller batches of pixels. The script runs through a range of batch sizes and reports the fastest data reduction time and the corresponding batch size. Then one can run `reduce.py` to reduce data with the optimal batch size as an input.
 
 
-## Running 'benchmark.py'
+## Running `benchmark.py`
 
 Example
- ' python benchmark.py -i "data.fits" --cpu ' 
+` python benchmark.py -i "data.fits" --cpu `
  
  Help:
  
@@ -25,9 +25,9 @@ optional arguments:
   -g, --gpu             select gpu implementation (default: False)
   
   
-## Running 'reduce.py'
+## Running `reduce.py`
 
-' python reduce.py -i "data.fits" -o "slopes.fits" --gpu -n 256 ' 
+` python reduce.py -i "data.fits" -o "slopes.fits" --gpu -n 256 `
 
 
 usage: reduce.py [-h] -i FILE -o FILE [-c] [-g] [-n NPIX]
