@@ -5,6 +5,8 @@ A public repo for GPU implementations of IR astronomical data reduction techniqu
 
 gpu_IR is currently base on two scripts, `benchmark.py` and `reduce.py`. Both scripts take in a fits file of non-destructive or up-the-ramp data and performs a linear fit on each pixel. `benchmark.py` reduces (linear fit) the data on either a gpu or cpu, splitting up the job into smaller batches of pixels. The script runs through a range of batch sizes and reports the fastest data reduction time and the corresponding batch size. Then one can run `reduce.py` to reduce data with the optimal batch size as an input.
 
+![RTX2070_matrix](https://user-images.githubusercontent.com/59940809/194172704-a1f6a259-a511-45e2-8562-00ffba6ab922.png)
+
 
 ## Running `benchmark.py`
 
