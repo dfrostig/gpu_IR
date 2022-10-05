@@ -13,40 +13,37 @@ Example
  
  Help:
 
- usage: benchmark.py [-h] -i FILE [-c] [-g]
+    usage: benchmark.py [-h] -i FILE [-c] [-g]
 
-Reduce IR data with a linear fit
+    Reduce IR data with a linear fit
 
-optional arguments:
+    optional arguments:
 
-  -h, --help            show this help message and exit
-  
-  -i FILE, --input FILE
-  
-                        input file (default: None)
-                        
-  -c, --cpu             select cpu implementation (default: False)
-  
-  -g, --gpu             select gpu implementation (default: False)
-  
+     -h, --help            show this help message and exit
+     -i FILE, --input FILE
+                           input file (default: None)                      
+     -c, --cpu             select cpu implementation (default: False)
+     -g, --gpu             select gpu implementation (default: False)
+
   
   
 ## Running `reduce.py`
 
 ` python reduce.py -i "data.fits" -o "slopes.fits" --gpu -n 256 `
 
+Help:
+    
+    usage: reduce.py [-h] -i FILE -o FILE [-c] [-g] [-n NPIX]
 
-usage: reduce.py [-h] -i FILE -o FILE [-c] [-g] [-n NPIX]
+    Reduce IR data with a linear fit
 
-Reduce IR data with a linear fit
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -i FILE, --input FILE
-                        input file (default: None)
-  -o FILE, --output FILE
-                        output filename and path (default: None)
-  -c, --cpu             select cpu implementation (default: False)
-  -g, --gpu             select gpu implementation (default: False)
-  -n NPIX, --number_of_pixels NPIX
-                        number of pixels in batch (default: 65536)
+    optional arguments:
+      -h, --help            show this help message and exit
+      -i FILE, --input FILE
+                            input file (default: None)
+      -o FILE, --output FILE
+                            output filename and path (default: None)
+      -c, --cpu             select cpu implementation (default: False)
+      -g, --gpu             select gpu implementation (default: False)
+      -n NPIX, --number_of_pixels NPIX
+                            number of pixels in batch (default: 65536)
