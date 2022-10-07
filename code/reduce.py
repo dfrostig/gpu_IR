@@ -4,7 +4,7 @@ import cupy as cp
 import argparse
 
 # load in data and format for reduction  
-def load_data(file_path):
+def load_data_w(file_path):
     
     # pull in data
     hdul = fits.open(file_path)
@@ -22,6 +22,27 @@ def load_data(file_path):
     data = data.reshape((z, x*y)).T
     # add one dimension for matrix operations later
     data = data[:,:,np.newaxis]
+    # retrun data and shape
+    print(np.shape(data))
+    return data, (x,y,z) 
+
+# load in data and format for reduction  
+def load_data(file_path):
+    
+    # pull in data
+    hdul = fits.open(file_path)
+    data = hdul[1].data
+    hdr = hdul[1].header
+
+    if(hdr['NAXIS']!=4):
+        raise Exception("Need to check formatting. TODO: Improve") 
+    else:
+        x = hdr['NAXIS1']
+        y = hdr['NAXIS2']
+        z = hdr['NAXIS3']
+        
+    # reshape into a line, x*y long   
+    data = data.reshape((1, z, x*y))
     # retrun data and shape
     return data, (x,y,z) 
 
@@ -43,7 +64,7 @@ def linearfit_cpu(data, n_frames, n_loops, n_pix, slope_array):
     
     # loop over data batches
     for i in range(n_loops):
-        res = cpu_ols(A, data[i*n_pix:(i*n_pix)+n_pix,:,:])
+        res = cpu_ols(A, data[:,:,i*n_pix:(i*n_pix)+n_pix])
         slope_array[i*n_pix:(i*n_pix)+n_pix] = res[0].flatten()  
     return slope_array
         
@@ -57,17 +78,17 @@ def linearfit_gpu(data, n_frames, n_loops, n_pix, slope_array):
     
     # loop over data batches
     for i in range(n_loops):
-        res = cpu_ols(A, cp.asarray(data[i*n_pix:(i*n_pix)+n_pix,:,:]))
+        res = cpu_ols(A, cp.asarray(data[:,:,i*n_pix:(i*n_pix)+n_pix]))
         slope_array[i*n_pix:(i*n_pix)+n_pix] = res[0].get().flatten()  
     return slope_array
 
 # Save data 
-def save_results(data, data_shape, n_pix, file_path, method):
-    # get data shape
-    (pix_tot, n_frames, m_axis) = data.shape
+def save_results(data, data_shape, n_pix, file_path, method):    
+    pix_tot = data_shape[0]*data_shape[1]
+    n_frames = data_shape[2]
     
     # pepare array for results
-    slope_array = np.zeros(int(pix_tot))
+    slope_array = np.zeros(pix_tot)
     
     # set number of data batches based on pixel size
     n_loops = int(np.ceil(pix_tot/(n_pix)))
