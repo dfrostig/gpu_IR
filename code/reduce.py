@@ -55,10 +55,7 @@ def gpu_ols_3D(A,y):
     return cp.dot((cp.dot(cp.linalg.inv(cp.dot(A.T,A)),A.T)),y)
     
 # Run through OLS fit for cpu
-def linearfit_cpu(data, n_frames, n_loops, n_pix, slope_array):
-    # range of frame numbers
-    fnum = np.linspace(0,n_frames-1, n_frames)
-    
+def linearfit_cpu(data, fnum, n_loops, n_pix, slope_array):
     # prepare A matrix for OLS fit
     A = np.vstack([fnum, np.ones(len(fnum))]).T
     
@@ -66,13 +63,10 @@ def linearfit_cpu(data, n_frames, n_loops, n_pix, slope_array):
     for i in range(n_loops):
         res = cpu_ols(A, data[:,:,i*n_pix:(i*n_pix)+n_pix])
         slope_array[i*n_pix:(i*n_pix)+n_pix] = res[0].flatten()  
-    return slope_array
+    return 
         
 # Run through OLS fit for cpu
-def linearfit_gpu(data, n_frames, n_loops, n_pix, slope_array):
-    # range of frame numbers
-    fnum = np.linspace(0,n_frames-1, n_frames)
-    
+def linearfit_gpu(data, fnum, n_loops, n_pix, slope_array):
     # prepare A matrix for OLS fit
     A = cp.vstack([fnum, np.ones(len(fnum))]).T
     
@@ -80,7 +74,7 @@ def linearfit_gpu(data, n_frames, n_loops, n_pix, slope_array):
     for i in range(n_loops):
         res = cpu_ols(A, cp.asarray(data[:,:,i*n_pix:(i*n_pix)+n_pix]))
         slope_array[i*n_pix:(i*n_pix)+n_pix] = res[0].get().flatten()  
-    return slope_array
+    return
 
 # Save data 
 def save_results(data, data_shape, n_pix, file_path, method):    
@@ -89,15 +83,17 @@ def save_results(data, data_shape, n_pix, file_path, method):
     
     # pepare array for results
     slope_array = np.zeros(pix_tot)
-    
+    # prepare frame range and result array outside of loop
+    fnum = np.linspace(0,n_frames-1, n_frames)
+
     # set number of data batches based on pixel size
     n_loops = int(np.ceil(pix_tot/(n_pix)))
     
     # do the fit
     if method == "cpu":
-        linearfit_cpu(data, n_frames, n_loops, n_pix, slope_array)
+        linearfit_cpu(data, fnum, n_loops, n_pix, slope_array)
     else:
-        linearfit_gpu(data, n_frames, n_loops, n_pix, slope_array)
+        linearfit_gpu(data, fnum, n_loops, n_pix, slope_array)
     
     # save
     hdu = fits.PrimaryHDU()
