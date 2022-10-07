@@ -6,7 +6,7 @@ import argparse
 import time
 
 # load in data and format for reduction  
-def load_data(file_path):
+def load_data_winter(file_path):
     
     # pull in data
     hdul = fits.open(file_path)
@@ -24,6 +24,26 @@ def load_data(file_path):
     data = data.reshape((z, x*y)).T
     # add one dimension for matrix operations later
     data = data[:,:,np.newaxis]
+    # retrun data and shape
+    return data, (x,y,z) 
+
+# load in data and format for reduction  
+def load_data(file_path):
+    
+    # pull in data
+    hdul = fits.open(file_path)
+    data = hdul[1].data
+    hdr = hdul[1].header
+
+    if(hdr['NAXIS']!=4):
+        raise Exception("Need to check formatting. TODO: Improve") 
+    else:
+        x = hdr['NAXIS1']
+        y = hdr['NAXIS2']
+        z = hdr['NAXIS3']
+        
+    # reshape into a line, x*y long   
+    data = data.reshape((1, z, x*y))
     # retrun data and shape
     return data, (x,y,z) 
 
@@ -45,7 +65,7 @@ def linearfit_cpu(data, n_frames, n_loops, n_pix, slope_array):
     
     # loop over data batches
     for i in range(n_loops):
-        res = cpu_ols(A, data[i*n_pix:(i*n_pix)+n_pix,:,:])
+        res = cpu_ols(A, data[:,:,i*n_pix:(i*n_pix)+n_pix])
         slope_array[i*n_pix:(i*n_pix)+n_pix] = res[0].flatten()  
     return slope_array
         
@@ -59,24 +79,25 @@ def linearfit_gpu(data, n_frames, n_loops, n_pix, slope_array):
     
     # loop over data batches
     for i in range(n_loops):
-        res = cpu_ols(A, cp.asarray(data[i*n_pix:(i*n_pix)+n_pix,:,:]))
+        res = cpu_ols(A, cp.asarray(data[:,:,i*n_pix:(i*n_pix)+n_pix]))
         slope_array[i*n_pix:(i*n_pix)+n_pix] = res[0].get().flatten()  
     return slope_array
 
 # Benchmark  for cpu
-def benchmark_cpu(data):
+def benchmark_cpu(data, data_shape):
     cpu_times= []
     
     # get data shape
-    (pix_tot, n_frames, m_axis) = data.shape
+    pix_tot = data_shape[0]*data_shape[1]
+    n_frames = data_shape[2]
     
     # pass in data in batches of 2**n, up to the total pixel number
     data_batches = range(2,int(np.ceil(np.log2(pix_tot))),1)
-
+    slope_array = np.zeros(int(pix_tot))
+    
     # loop through data batch sizes
     for batch_size in data_batches:
         n_pix = 2**(batch_size)
-        slope_array = np.zeros(int(pix_tot))
         n_loops = int(np.ceil(pix_tot/(n_pix)))
 
         try:
@@ -93,19 +114,20 @@ def benchmark_cpu(data):
     return cpu_times
     
 # Benchmark  for gpu
-def benchmark_gpu(data):
+def benchmark_gpu(data, data_shape):
     gpu_benchmarks = []
     
     # get data shape
-    (pix_tot, n_frames, m_axis) = data.shape
+    pix_tot = data_shape[0]*data_shape[1]
+    n_frames = data_shape[2]
     
     # pass in data in batches of 2**n, up to the total pixel number
-    data_batches = range(12,int(np.ceil(np.log2(pix_tot))),1)
-
+    data_batches = range(8,int(np.ceil(np.log2(pix_tot))),1)
+    slope_array = np.zeros(int(pix_tot))
+    
     # loop through data batch sizes
     for batch_size in data_batches:
         n_pix = 2**(batch_size)
-        slope_array = np.zeros(int(pix_tot))
         n_loops = int(np.ceil(pix_tot/(n_pix)))
 
         try:
@@ -157,6 +179,6 @@ if __name__ == "__main__":
     
     # run reduction
     if args.cpu:
-        benchmark_cpu(data)
+        benchmark_cpu(data, data_shape)
     elif args.gpu:
-        benchmark_gpu(data)
+        benchmark_gpu(data, data_shape)
